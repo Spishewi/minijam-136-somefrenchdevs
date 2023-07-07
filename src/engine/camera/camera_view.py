@@ -97,20 +97,17 @@ class CameraView:
         animation_tiles = self.map_manager.animated_tiles[self.map_manager.current_map]
         ticks = pygame.time.get_ticks()
         
-
+        object_manager = self.map_manager.get_current_objects_manager()
         for layer_index in range(len(map.layers)):
-            if (isinstance(map.layers[layer_index], pytmx.TiledTileLayer)) and map.layers[layer_index].visible:
+            if (isinstance(map.layers[layer_index], pytmx.TiledTileLayer)) and map.layers[layer_index].visible and map.layers[layer_index].name != "zone":
                 tiles = self._tiles_to_draw(range(minx, maxx), range(miny, maxy), layer_index, animation_tiles, ticks, offset_x, offset_y, tile_size_factor)
-
+                
                 if map.layers[layer_index].name == "ground":
-
-                    object_manager = self.map_manager.get_current_objects_manager()
                     object_manager.draw(
                         draw_surface=draw_surface,
                         offset=offset,
                         factor=self.factor)
                     
-                        
                 draw_surface.blits(tiles, doreturn=False)
 
         object_manager.draw_ui(
@@ -135,7 +132,7 @@ class CameraView:
         #x_const = half_width / (tile_size_factor)
         #y_const = half_height / (tile_size_factor)
         
-        center_pos = pygame.Vector2(0, 0)
+        center_pos = pygame.Vector2(map.width, map.height) // 2
 
         surface, offset = self._get_view_surface(center_pos, draw_surface.get_width(), draw_surface.get_height())
         draw_surface.blit(surface, (0, 0))
