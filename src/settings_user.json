@@ -1,0 +1,12 @@
+{
+    "window_width":480,
+    "window_height":270,
+    "fullscreen":false,
+
+    "mouse":{
+        "sensivity": 1,
+        "scroll_speed": 15
+    },
+
+    "fps": -1
+}

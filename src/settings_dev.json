@@ -1,0 +1,32 @@
+{
+    "tile_size":16,
+    "max_memory_map": 5,
+    "player":{
+        "speed":12,
+        "jump_max_height":4.5,
+        "jump_min_height":1.5,
+        "damping":1.4,
+        "rope_distance":11,
+        "min_rope_distance":2,
+        "rewind_speed":12,
+        "length_deviation": 0.2
+    },
+    "physics":{
+        "gravity_orientation":0,
+        "gravity_strength":70
+
+    },
+    "bat":{
+        "speed": 9,
+        "search_radius": 5,
+        "flee_duration": 2500
+    },
+    "firefly":{
+        "speed": 2,
+        "light_color": [
+            155,
+            255,
+            155
+        ]
+    }
+}
