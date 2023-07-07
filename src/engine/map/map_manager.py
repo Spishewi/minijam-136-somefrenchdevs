@@ -13,13 +13,12 @@ from collections import namedtuple
 from engine.utils.image import DynamicImage
 from engine.utils.enumerations import MemoryPriority
 from engine.utils.settings import dev_settings
-from engine.objects_manager import ObjectsManager
 from engine.scene.scene_event import SCENE_SET_LOADINGSCREEN, SCENE_REMOVE_LOADINGSCREEN, SCENE_TRANSITION_OUT, scene_error_wrapper
 
 
 
 
-MapTuple = namedtuple('MapTuple', ['priority', 'map', 'objects_manager'])
+MapTuple = namedtuple('MapTuple', ['priority', 'map'])
 
 NEW_MAP_SET = pygame.event.custom_type()
 """
@@ -98,10 +97,6 @@ class MapManager:
         if dev_settings.tile_size != new_map.tilewidth:
             raise ValueError(f"""{map_name} is not compatible\nwrong tile size !""")
 
-        # On instancie le gestionnaire d'objets
-        objects_manager = ObjectsManager(new_map, 
-                                         map_manager=self)
-
 
         # On charge les animations
         animated_tiles = {}
@@ -116,7 +111,7 @@ class MapManager:
             if frames != []:
                 animated_tiles[gid] = AnimatedTile(frames, sum([i.duration for i in frames]))
 
-        self._maps[map_name] = MapTuple(self._maps_config[map_name]["priority"], new_map, objects_manager)
+        self._maps[map_name] = MapTuple(self._maps_config[map_name]["priority"], new_map)
         self.animated_tiles[map_name] = animated_tiles
 
         self._loading_maps.remove(map_name)
@@ -129,12 +124,6 @@ class MapManager:
 
     def get_current_map(self) -> pytmx.TiledMap:
         return self.get_map(self.current_map)
-    
-    def get_objects_manager(self, map_name: str) -> ObjectsManager:
-        return self._maps[map_name].objects_manager
-    
-    def get_current_objects_manager(self) -> ObjectsManager:
-        return self.get_objects_manager(self.current_map)
 
     def get_around_collisions(self, map_name: str, coords: pygame.Vector2, size: int, layers_names: list[str], reverse:bool = False) -> dict[str,list[pygame.Vector2]]:
         map = self.get_map(map_name)

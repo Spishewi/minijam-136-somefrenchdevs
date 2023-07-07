@@ -11,9 +11,11 @@ from engine.fixed_ui.widgets.checkbox import Checkbox
 
 from engine.utils.enumerations import AnchorX, AnchorY
 
-from engine.scene.game_event import GAME_SAVE, GAME_SAVE_AND_QUIT
+from engine.scene.game_event import *
 
 from engine.utils.settings import debug_settings
+
+from engine.utils.utilities import number_to_str
 
 
 class IngameMenu():
@@ -28,8 +30,8 @@ class IngameMenu():
             btn_hovered_background_color = pygame.Color(75, 125, 175),
             btn_outline_color = pygame.Color(255, 255, 255),
             btn_hovered_outline_color = pygame.Color(125, 175, 225),
-            btn_border_radius = 3,
-            btn_outline_width = 2,
+            btn_border_radius = 2,
+            btn_outline_width = 1,
             btn_padding = 5,
 
             check_width = 3,
@@ -37,12 +39,20 @@ class IngameMenu():
 
             slider_bar_color = pygame.Color(50, 75, 100),
             slider_bar_width = 3
+
         )
+
+        self.selected_tower_label = None
+        self.selected_tower = "Money tower"
+        self.money_label = None
+        self.money_value = 0
+        self.price_label  = None
+        self.price_value = 0
 
         self.master = Frame()
 
         self.previous_menu = None
-        self.opened = False
+        self._main()
 
     def _main(self) -> None:
         self.previous_menu = None
@@ -50,17 +60,36 @@ class IngameMenu():
         self.master.clear()
         self.master.grid_configure(6, 1)
 
-        menu_title = Label(self.theme, "MENU", 20)
+        menu_title = Label(self.theme, "SELECT TOWER", 8)
 
-        settings_btn = Button(self.theme, "Options", 15, self._settings, height=30)
-        save_btn = Button(self.theme, "Sauvegarder", 15, lambda: pygame.event.post(pygame.event.Event(GAME_SAVE)), height=30)
-        quit_game_btn = Button(self.theme, "Quitter", 15, lambda: pygame.event.post(pygame.event.Event(GAME_SAVE_AND_QUIT)), height=30)
+        self.money_label = Label(self.theme, f"Money: {number_to_str(self.money_value)}", 8)
+
+        selected_tower_title = Label(self.theme, "selected :", 8)
+        self.selected_tower_label = Label(self.theme, self.selected_tower, 8)
+
+        self.price_label = Label(self.theme, "Price: 0", 8)
+
+        def select_damage_tower():
+            pygame.event.post(pygame.Event(SELECT_DAMAGE_TOWER))
+            self.selected_tower_label.text = "Damage tower"
+
+        def select_money_tower():
+            pygame.event.post(pygame.Event(SELECT_MONEY_TOWER))
+            self.selected_tower_label.text = "Money tower"
+
+        damage_tower_btn = Button(self.theme, "Damage tower", 8, select_damage_tower, width=108)
+        money_tower_btn = Button(self.theme, "Money tower", 8, select_money_tower, width=108)
         
-        
-        self.master.list(menu_title, margin_y=50, anchor_x=AnchorX.CENTER)
-        self.master.list(settings_btn, 10, 20, AnchorX.CENTER)
-        self.master.list(save_btn, 10, 20, AnchorX.CENTER)
-        self.master.list(quit_game_btn, 10, 20, AnchorX.CENTER)
+        self.master.place(menu_title, pygame.Vector2(375, 20))
+
+        self.master.place(self.money_label, pygame.Vector2(375, 40))
+
+        self.master.place(selected_tower_title, pygame.Vector2(375, 60))
+        self.master.place(self.selected_tower_label, pygame.Vector2(375, 70))
+        self.master.place(self.price_label, pygame.Vector2(375, 80))
+
+        self.master.place(damage_tower_btn, pygame.Vector2(370, 110))
+        self.master.place(money_tower_btn, pygame.Vector2(370, 140))
 
         return None
 
@@ -87,19 +116,6 @@ class IngameMenu():
         if debug_settings.authorized:
             self.master.list(debug_settings_btn, 10, 20, AnchorX.CENTER)
 
-    def _graphics_settings(self) -> None:
-        self.previous_menu = self._settings
-
-        self.master.clear()
-        self.master.grid_configure(6, 1)
-
-        menu_title = Label(self.theme, "OPTIONS GRAPHIQUES", 20)
-
-        coming_soon = Label(self.theme, "COMING SOON", 15)
-
-        self.master.list(menu_title, margin_y=50, anchor_x=AnchorX.CENTER)
-        self.master.grid(coming_soon, 3, 0, (AnchorX.CENTER, AnchorY.CENTER))
-
     def _sound_settings(self) -> None:
         self.previous_menu = self._settings
 
@@ -107,19 +123,6 @@ class IngameMenu():
         self.master.grid_configure(6, 1)
 
         menu_title = Label(self.theme, "MUSIQUES ET SONS", 20)
-
-        coming_soon = Label(self.theme, "COMING SOON", 15)
-
-        self.master.list(menu_title, margin_y=50, anchor_x=AnchorX.CENTER)
-        self.master.grid(coming_soon, 3, 0, (AnchorX.CENTER, AnchorY.CENTER))
-
-    def _keybinds_settings(self) -> None:
-        self.previous_menu = self._settings
-
-        self.master.clear()
-        self.master.grid_configure(6, 1)
-
-        menu_title = Label(self.theme, "CONTRÔLES", 20)
 
         coming_soon = Label(self.theme, "COMING SOON", 15)
 
@@ -167,26 +170,6 @@ class IngameMenu():
                 item_checkbox.set_callback(f, section_attribute=section_attribute, item_name=item_name)
                 menu_frame.list(item_checkbox, margin_x=alinea_x*2, margin_y=margin_y)
 
-        
-        """
-        players_label = Label(self.theme, "Players", title_size)
-        menu_frame.list(players_label, margin_x=margin_x, margin_y=margin_y)
-
-        
-        players_rays_label = Label(self.theme, "rays", std_txt_size)
-        menu_frame.list(players_rays_label, margin_x=margin_x, margin_y=margin_y)
-        def f(state):
-            debug_settings.players.rays = state
-            debug_settings.save()
-        players_rays_checkbox = Checkbox(self.theme, checkbox_width, checkbox_height, debug_settings.players.rays, f)
-        menu_frame.list(players_rays_checkbox, margin_x=margin_x)
-
-        bats_label = Label(self.theme, "Bats", title_size)
-        menu_frame.list(bats_label, margin_x=margin_x, margin_y=margin_y)
-
-
-        fireflies_label = Label(self.theme, "Fireflies", title_size)
-        menu_frame.list(fireflies_label, margin_x=margin_x, margin_y=margin_y)"""
 
         self.master.list(menu_title, margin_y=50, anchor_x=AnchorX.CENTER)
         self.master.grid(menu_frame, 2, 0, row_span=4)
@@ -196,75 +179,15 @@ class IngameMenu():
         self.master.draw(draw_surface)
 
     def event_handler(self, event: pygame.event.Event) -> None:
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                self.master.clear()
-                if self.opened:
-                    if self.previous_menu != None:
-                        self.previous_menu()
-                    else:
-                        self.opened = False
-                        self.master.set_background(0)
-
-                else:
-                    self._main()
-                    self.opened = True
-                    self.master.set_background(0.5)
-
         self.master.event_handler(event)
+        if event.type == MONEY_UPDATE:
+            self.money_value = event.value
+            if self.money_label != None:
+                self.money_label.text = f"Money: {number_to_str(self.money_value)}"
+        if event.type == PRICE_UPDATE:
+            self.price_value = event.value
+            if self.price_label != None:
+                self.price_label.text = f"Price: {number_to_str(self.price_value)}"
     
     def update(self, dt: float) -> None:
         self.master.update(dt)
-
-
-
-
-
-"""
-theme = Widget_theme()
-theme.update(
-    font_path = "../assets/font/PublicPixel.ttf",
-    text_color = pygame.Color(255, 255, 255),
-    hovered_text_color = pygame.Color(150, 200, 250),
-
-    btn_background_color = pygame.Color(200, 200, 200),
-    btn_hovered_background_color = pygame.Color(75, 125, 175),
-    btn_outline_color = pygame.Color(255, 255, 255),
-    btn_hovered_outline_color = pygame.Color(125, 175, 225),
-    btn_border_radius = 3,
-    btn_outline_width = 2,
-    btn_padding = 5,
-
-    check_width = 3,
-    check_color = pygame.Color(153, 255, 147),
-
-    slider_bar_color = pygame.Color(50, 75, 100),
-    slider_bar_width = 3
-    
-)
-
-self.test_label = Label(theme, "Hello World", 10)
-
-#self.menu.grid(self.test_label, 1, 1, (AnchorX.LEFT, AnchorY.TOP))
-#self.menu.grid(self.test_label, 0, 1, (AnchorX.LEFT, AnchorY.BOTTOM))
-
-
-
-self.test_btn = Button(theme, "Hello World 2", 8, lambda: print("hello"))
-self.menu.place(self.test_btn, pygame.Vector2(50, 50), (AnchorX.LEFT, AnchorY.TOP))
-
-self.checkbox_test = Checkbox(theme, 25, 25)
-self.menu.place(self.checkbox_test, pygame.Vector2(50, 100))
-
-self.slider_test = Slider(theme, 200, 20, default_value=1, orientation=Orientation.HORIZONTAL)
-self.menu.place(self.slider_test, pygame.Vector2(150, 150), anchor=(AnchorX.CENTER, AnchorY.CENTER))
-
-self.secondary_frame = Frame(250, 200, scrollable=True)
-
-for i in range(1):
-    self.test_btn_2 = Button(theme, f"Hello World {i}", 8, lambda: print("hello 2"))
-    self.secondary_frame.place(self.test_btn_2, pygame.Vector2(0, 20 * i), (AnchorX.LEFT, AnchorY.TOP))
-
-
-
-self.menu.grid(self.secondary_frame, 1, 1)"""

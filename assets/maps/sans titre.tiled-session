@@ -11,30 +11,30 @@
     "fileStates": {
         "TilesetGrass/grass_biome.tsx": {
             "scaleInDock": 2,
-            "scaleInEditor": 1
+            "scaleInEditor": 4
         },
         "TilesetGrass/map1.tmx": {
             "scale": 1.2666666666666666,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 167.76315789473682,
-                "y": 335.13157894736844
+                "x": 168.1578947368421,
+                "y": 336.3157894736842
             }
         },
         "TilesetGrass/map2.tmx": {
             "scale": 3.5466666666666664,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 119.9718045112782,
-                "y": 119.9718045112782
+                "x": 120.11278195488721,
+                "y": 120.11278195488723
             }
         },
         "map1.tmx": {
             "scale": 3,
-            "selectedLayer": 0,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 143.33333333333331,
-                "y": 128.66666666666663
+                "x": 135.33333333333331,
+                "y": 57
             }
         }
     },
@@ -44,16 +44,15 @@
     "map.tileWidth": 16,
     "map.width": 16,
     "openFiles": [
-        "TilesetGrass/map1.tmx",
-        "TilesetGrass/map2.tmx",
-        "map1.tmx"
-    ],
-    "project": "sans titre.tiled-project",
-    "property.type": "object",
-    "recentFiles": [
-        "TilesetGrass/map1.tmx",
-        "TilesetGrass/map2.tmx",
         "map1.tmx",
         "TilesetGrass/grass_biome.tsx"
+    ],
+    "project": "sans titre.tiled-project",
+    "property.type": "bool",
+    "recentFiles": [
+        "map1.tmx",
+        "TilesetGrass/grass_biome.tsx",
+        "TilesetGrass/map2.tmx",
+        "TilesetGrass/map1.tmx"
     ]
 }

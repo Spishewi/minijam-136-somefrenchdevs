@@ -1,11 +1,9 @@
 import pygame.event
 
-GAME_SAVE = pygame.event.custom_type()
-"""
-This event must be triggered to save the game
-"""
+SELECT_DAMAGE_TOWER = pygame.event.custom_type()
 
-GAME_SAVE_AND_QUIT = pygame.event.custom_type()
-"""
-This event must be triggered to save and quit the game
-"""
+SELECT_MONEY_TOWER = pygame.event.custom_type()
+
+MONEY_UPDATE = pygame.event.custom_type()
+
+PRICE_UPDATE = pygame.event.custom_type()

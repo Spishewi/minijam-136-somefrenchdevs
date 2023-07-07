@@ -15,7 +15,8 @@ from engine.utils.enumerations import Side
 
 # types hints
 if TYPE_CHECKING:
-    ...
+    from engine.tower.tower_manager import TowerManager
+    from engine.wave.wave_manager import WaveManager
 class CameraView:
     """
     permet d'afficher une partie d'une map
@@ -66,7 +67,7 @@ class CameraView:
                     tiles.append((tile_image.get_image(self.factor), (posx, posy)))
         return tiles
 
-    def _get_view_surface(self, coords: pygame.Vector2, width: int, height: int) -> pygame.Surface:
+    def _get_view_surface(self, coords: pygame.Vector2, width: int, height: int, tower_manager: TowerManager, wave_manager: WaveManager) -> pygame.Surface:
 
         draw_surface = pygame.Surface((width, height))
 
@@ -97,27 +98,22 @@ class CameraView:
         animation_tiles = self.map_manager.animated_tiles[self.map_manager.current_map]
         ticks = pygame.time.get_ticks()
         
-        object_manager = self.map_manager.get_current_objects_manager()
         for layer_index in range(len(map.layers)):
             if (isinstance(map.layers[layer_index], pytmx.TiledTileLayer)) and map.layers[layer_index].visible and map.layers[layer_index].name != "zone":
                 tiles = self._tiles_to_draw(range(minx, maxx), range(miny, maxy), layer_index, animation_tiles, ticks, offset_x, offset_y, tile_size_factor)
                 
-                if map.layers[layer_index].name == "ground":
-                    object_manager.draw(
-                        draw_surface=draw_surface,
-                        offset=offset,
-                        factor=self.factor)
                     
-                draw_surface.blits(tiles, doreturn=False)
-
-        object_manager.draw_ui(
-                        draw_surface=draw_surface,
-                        offset=offset,
-                        factor=self.factor)
-    
+                draw_surface.fblits(tiles)
+                
+        wave_manager.draw(draw_surface)
+        wave_manager.draw_ui(draw_surface)
+        
+        tower_manager.draw(draw_surface)
+        tower_manager.draw_ui(draw_surface)
+        
         return draw_surface, offset
 
-    def draw(self, draw_surface: pygame.Surface) -> None:
+    def draw(self, draw_surface: pygame.Surface, tower_manager: TowerManager, wave_manager: WaveManager) -> None:
         """
         permet d'afficher / de dessiner la map
         """
@@ -126,13 +122,14 @@ class CameraView:
 
         tile_size_factor = dev_settings.tile_size * self.factor
 
-        half_width = draw_surface.get_width() / 2
-        half_height = draw_surface.get_height() / 2
-
-        #x_const = half_width / (tile_size_factor)
-        #y_const = half_height / (tile_size_factor)
+        
         
         center_pos = pygame.Vector2(map.width, map.height) // 2
 
-        surface, offset = self._get_view_surface(center_pos, draw_surface.get_width(), draw_surface.get_height())
-        draw_surface.blit(surface, (0, 0))
+        surface, offset = self._get_view_surface(center_pos, map.width*tile_size_factor, map.height*tile_size_factor, tower_manager, wave_manager)
+
+        if map.background_color != None:
+            draw_surface.fill(map.background_color)
+
+        const_hardcore = pygame.Vector2(draw_surface.get_width(), draw_surface.get_height()) / 2 - center_pos * tile_size_factor
+        draw_surface.blit(surface, const_hardcore)

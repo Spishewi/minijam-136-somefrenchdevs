@@ -8,6 +8,8 @@ from engine.utils.settings import dev_settings, debug_settings
 #from engine.game.map.map_manager import MapManager, NEW_MAP_SET
 from engine.camera.camera_view import CameraView
 from engine.map.map_manager import MapManager
+from engine.tower.tower_manager import TowerManager
+from engine.wave.wave_manager import WaveManager
 from engine.scene.scene import Scene
 from engine.scene.scene_event import SCENE_TRANSITION_IN, SCENE_TRANSITION_OUT
 
@@ -16,7 +18,6 @@ from engine.menu.ingame_menu import IngameMenu
 from engine.utils.enumerations import AnchorX, AnchorY, Orientation
 from engine.utils.hitbox import RectangularHitbox
 
-from engine.scene.game_event import GAME_SAVE, GAME_SAVE_AND_QUIT
 from engine.scene.scene_event import SCENE_QUIT
 
 from debug import debug
@@ -36,19 +37,6 @@ class GameScene(Scene):
 
         self.map_manager = MapManager("../assets/maps/maps.json")
 
-        
-        # Loading save
-        if os.path.exists("../saves/save.data") and not new_game:
-            with open("../saves/save.data", "rb") as file:
-                unpickler = pickle.Unpickler(file)
-                save_dict = unpickler.load()
-        else:
-            save_dict = {
-                "map_name": "level_0",
-                "player_0_coords": None,
-                "player_1_coords": None,
-                "checkpoint": None
-            }
         self.map_manager.load_map("map1") # not autoload in order to keep syncronous
         self.map_manager.set_map("map1")
         self.map_manager.current_map = self.map_manager.new_map_name
@@ -66,36 +54,41 @@ class GameScene(Scene):
         # vars
         self.new_map_set = False
 
+        self.wave_manager = WaveManager(self.map_manager)
+        self.tower_manager = TowerManager(self.map_manager)
+
+        self.dt_multiplier = 1
+
     @Scene.update_decorator
     def update(self, dt: float):
+
+        dt = dt * self.dt_multiplier
         # gestion des menus ------------------------------
         self.menu.update(dt)
         # gestion du jeu --------------------------------- 
         self.map_manager.update()
-
+        self.wave_manager.update(dt)
+        
         debug.add(self.map_manager._loading_maps)
         debug.add(self.map_manager._maps)
         debug.add(self.map_manager.current_map)
 
-        object_manager = self.map_manager.get_current_objects_manager()
-        object_manager.update(dt)
-
     @Scene.event_handler_decorator
     def event_handler(self, event: pygame.event.Event):
         self.menu.event_handler(event)
-        object_manager = self.map_manager.get_current_objects_manager()
-        object_manager.event_handler(event,
-                                     tp_out_command = self.teleport_out)
+        self.tower_manager.event_handler(event)
+        self.wave_manager.event_handler(event)
 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_F3:
                 if debug_settings.authorized and event.mod & pygame.KMOD_ALT:
                     self.teleport_out("hub", "player_spawn_coords")
-        elif event.type == GAME_SAVE:
-            self.save()
-        elif event.type == GAME_SAVE_AND_QUIT:
-            self.save()
-            pygame.event.post(pygame.event.Event(SCENE_QUIT))
+            
+            if event.key == pygame.K_SPACE:
+                self.dt_multiplier = 1
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                self.dt_multiplier = 200
             
     @Scene.map_set_decorator
     def handle_map_set(self):
@@ -109,7 +102,8 @@ class GameScene(Scene):
     
     @Scene.draw_decorator
     def draw(self, draw_surface: pygame.Surface) -> None:
-        self.camera_view.draw(draw_surface)
+        self.camera_view.draw(draw_surface, self.tower_manager, self.wave_manager)
+        
         self.menu.draw(draw_surface)
 
 
@@ -119,13 +113,3 @@ class GameScene(Scene):
         self.scene_manager.is_transitioning_in = True
 
         self.map_manager.set_map(map_name, auto_load=True)
-
-    def save(self):
-        return
-        save_dict = {"map_name": self.map_manager.current_map, "checkpoint": self._last_door_pos}
-        for player in self.players:
-            save_dict[f"player_{player.id}_coords"] = player.position
-        
-        with open("../saves/save.data", "wb") as file:
-            pickler = pickle.Pickler(file, pickle.HIGHEST_PROTOCOL)
-            pickler.dump(save_dict)
