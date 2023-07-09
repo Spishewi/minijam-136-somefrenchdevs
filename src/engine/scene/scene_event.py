@@ -44,6 +44,13 @@ SCENE_NEW_GAME_LAUNCH = pygame.event.custom_type()
 """
 This event must be triggered when a we want to lauch the game scene with a new save
 """
+
+SCENE_SET_TITLESCREEN = pygame.event.custom_type()
+"""
+This event must be triggered when a we want to lauch the titlescreen
+"""
+
+
 def scene_error_wrapper(callback, *args, **kwargs):
     try:
         callback(*args, **kwargs)

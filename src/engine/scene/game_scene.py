@@ -12,13 +12,12 @@ from engine.tower.tower_manager import TowerManager
 from engine.wave.wave_manager import WaveManager
 from engine.scene.scene import Scene
 from engine.scene.scene_event import SCENE_TRANSITION_IN, SCENE_TRANSITION_OUT
+from engine.scene.game_event import GAME_OVER
 
 from engine.menu.ingame_menu import IngameMenu
 
 from engine.utils.enumerations import AnchorX, AnchorY, Orientation
 from engine.utils.hitbox import RectangularHitbox
-
-from engine.scene.scene_event import SCENE_QUIT
 
 from debug import debug
 
@@ -35,7 +34,7 @@ class GameScene(Scene):
     def load(self, new_game: bool):
         # Initializing the mapManager
 
-        self.map_manager = MapManager("../assets/maps/maps.json")
+        self.map_manager = MapManager("./assets/maps/maps.json")
 
         self.map_manager.load_map("map1") # not autoload in order to keep syncronous
         self.map_manager.set_map("map1")
@@ -53,31 +52,40 @@ class GameScene(Scene):
 
         # vars
         self.new_map_set = False
+        self.game_over = False
 
         self.wave_manager = WaveManager(self.map_manager)
-        self.tower_manager = TowerManager(self.map_manager)
+        self.tower_manager = TowerManager(self.map_manager, self.wave_manager)
 
         self.dt_multiplier = 1
-
+        
     @Scene.update_decorator
     def update(self, dt: float):
-
-        dt = dt * self.dt_multiplier
         # gestion des menus ------------------------------
         self.menu.update(dt)
-        # gestion du jeu --------------------------------- 
+        # gestion du jeu ---------------------------------
+        if self.game_over or self.menu.paused:
+            dt = 0
+        else:
+            dt = dt * self.dt_multiplier
+
+            
         self.map_manager.update()
         self.wave_manager.update(dt)
-        
-        debug.add(self.map_manager._loading_maps)
-        debug.add(self.map_manager._maps)
-        debug.add(self.map_manager.current_map)
+        self.tower_manager.update(dt)
 
     @Scene.event_handler_decorator
     def event_handler(self, event: pygame.event.Event):
+        self.menu.game_info = {'wave':self.wave_manager.wave_nb,
+                              'kills':self.wave_manager.kills,
+                              'money_earned': self.tower_manager.total_money_earned,
+                              'village_health': self.wave_manager.village_health,
+                              'enemy_dmg': self.wave_manager.enemies_level * 10
+                              }
         self.menu.event_handler(event)
-        self.tower_manager.event_handler(event)
-        self.wave_manager.event_handler(event)
+        if not self.game_over:  
+            self.tower_manager.event_handler(event)
+            self.wave_manager.event_handler(event)
 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_F3:
@@ -88,7 +96,13 @@ class GameScene(Scene):
                 self.dt_multiplier = 1
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                self.dt_multiplier = 200
+                self.dt_multiplier = 20
+        
+        if event.type == GAME_OVER:
+            self.menu._game_over(self.wave_manager.wave_nb, 
+                                 self.wave_manager.kills, 
+                                 self.tower_manager.total_money_earned)
+            self.game_over = True
             
     @Scene.map_set_decorator
     def handle_map_set(self):

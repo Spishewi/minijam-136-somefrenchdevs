@@ -4,10 +4,12 @@ import pygame
 
 from engine.fixed_ui.fixed_widget import Widget
 from engine.utils.hitbox import RectangularHitbox
+from engine.utils.sound import  BUTTON_SOUND
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from engine.fixed_ui.widget_theme import Widget_theme
+
 
 class Button(Widget):
     def __init__(self, theme: Widget_theme, text:str, font_size: int, callback: function = None, width: int = None, height: int = None) -> None:
@@ -46,9 +48,13 @@ class Button(Widget):
             self._width = self._rendered_text_surface.get_width() + self._theme.btn_padding * 2
         if not self._fixed_height:
             self._height = self._rendered_text_surface.get_height() + self._theme.btn_padding * 2
+            
+    def set_text(self, new_text):
+        self.text = new_text
+        self._render()
 
-    def set_callback(self, callback, **params) -> None:
-        self.callback = lambda x: callback(x, **params)
+    def set_callback(self, callback, *args_parameters, **kwargs_parameters) -> None:
+        self.callback = lambda: callback(*args_parameters, **kwargs_parameters)
 
     def event_handler(self, event: pygame.event.Event) -> None:
         if event.type == pygame.MOUSEMOTION:
@@ -59,7 +65,10 @@ class Button(Widget):
             
         if event.type == pygame.MOUSEBUTTONDOWN and self.hovered:
             if event.button == pygame.BUTTON_LEFT:
+                
                 if self.callback != None:
+                    BUTTON_SOUND
+                    BUTTON_SOUND.play()
                     self.callback()
                 
 

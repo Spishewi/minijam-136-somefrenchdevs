@@ -1,10 +1,10 @@
 # std import
 import pygame
-import pygame._sdl2.controller as controller
 import math
 
 # nos propre fichier import
 from engine.utils.settings import user_settings
+from engine.utils.sound import *
 from engine.scene.scene_event import *
 
 # scenes
@@ -12,13 +12,12 @@ from engine.scene.game_scene import GameScene
 from engine.map.map_manager import NEW_MAP_SET
 from engine.scene.titlescreen_scene import TitlescreenScene
 
-from debug import debug, debugfps
+from debug import debug
 
 class SceneManager():
     def __init__(self) -> None:
         # initialisation des modules
         pygame.init()
-        controller.init()
         
         flags = pygame.SCALED | pygame.RESIZABLE
         if user_settings.fullscreen:
@@ -26,6 +25,9 @@ class SceneManager():
 
         # initialisation de la fenêtre
         self.screen = pygame.display.set_mode((user_settings.window_width, user_settings.window_height), flags)
+        icon = pygame.image.load("./assets/icon.png").convert_alpha()
+        pygame.display.set_icon(icon)
+        pygame.display.set_caption("Another Tower Defense")
 
 
         #clock
@@ -42,6 +44,12 @@ class SceneManager():
         #self.scene = GameScene()
         self.scene = TitlescreenScene()
         self.scene.load()
+
+        pygame.mixer.music.load("./assets/sounds/triangular ideology-the fan sequel.ogg")
+        pygame.mixer.music.set_volume(user_settings.music)
+        pygame.mixer.music.play(loops=-1)
+
+        set_sound_volume(user_settings.sfx)
 
     def event_handler(self, event):
         """
@@ -63,6 +71,9 @@ class SceneManager():
         elif event.type == SCENE_NEW_GAME_LAUNCH:
             self.scene = GameScene(self)
             self.scene.load(new_game=True)
+        elif event.type == SCENE_SET_TITLESCREEN:
+            self.scene = TitlescreenScene()
+            self.scene.load()
         elif event.type == SCENE_TRANSITION_IN:
             self.need_transition_in = True
             self.is_transitioning_in = True
@@ -136,6 +147,16 @@ class SceneManager():
         pygame.draw.circle(draw_surface, (0,0,0), (draw_surface.get_width()//2, draw_surface.get_height()//2), math.ceil(circle_radius/1000*draw_surface.get_width()))
         self.screen.blit(draw_surface, (0, 0), special_flags=pygame.BLEND_SUB)
         
+        
+        draw_surface.fill((83*0.8, 120*0.8, 111*0.8))
+
+        if not reverse:
+            circle_radius = max(min(1000 - (now - start), 1000), 0)
+        else:
+            circle_radius = max(min(now - start, 1000), 0)
+        
+        pygame.draw.circle(draw_surface, (0,0,0), (draw_surface.get_width()//2, draw_surface.get_height()//2), math.ceil(circle_radius/1000*draw_surface.get_width()))
+        self.screen.blit(draw_surface, (0, 0), special_flags=pygame.BLEND_ADD)
 
     def run(self):
         self.running = True
@@ -162,7 +183,6 @@ class SceneManager():
                 self.scene.handle_map_set()
 
             # debugs adds ------------------------------------------
-            debugfps.add(f"FPS: {self.clock.get_fps():.0f}")
             debug.add(f"FPS: {self.clock.get_fps():.2f}")
             debug.add("") # retour à la ligne
 
@@ -178,12 +198,5 @@ class SceneManager():
 
             # draw debug
             debug.display(self.screen)
-            debugfps.display(self.screen)
-            
-            # choix du debug a afficher
-            if debug.get_state():
-                debugfps.disable()
-            else:
-                debugfps.enable()
 
             pygame.display.update()

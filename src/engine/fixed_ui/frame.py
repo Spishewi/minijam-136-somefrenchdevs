@@ -21,7 +21,7 @@ List_widget = namedtuple('List_widget', ['widget', 'margin_x', 'margin_y', 'anch
 Anchor = namedtuple('Anchor', ['x', 'y'])
 
 scrollbar_theme = Widget_theme(
-    font_path = "../assets/font/PublicPixel.ttf",
+    font_path = "./assets/font/PublicPixel.ttf",
     text_color = pygame.Color(255, 255, 255),
     hovered_text_color = pygame.Color(150, 200, 250),
 
@@ -183,7 +183,6 @@ class Frame():
         row_height = height/self._grid_row
 
         # DEFAULT TOP-LEFT
-        debug.add(f"{widget.col_span}, {widget.row_span}")
         coordinates.x = (col_width)*(widget.column )
         coordinates.y = (row_height)*(widget.row)
 

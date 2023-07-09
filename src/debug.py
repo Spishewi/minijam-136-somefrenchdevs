@@ -6,7 +6,7 @@ from engine.utils.settings import debug_settings
 
 pygame.font.init() # needed
 class Debug():
-    font = pygame.font.Font("../assets/font/PublicPixel.ttf", debug_settings.font_size)
+    font = pygame.font.Font("./assets/font/PublicPixel.ttf", debug_settings.font_size)
 
     def __init__(self, parent_surface: pygame.Surface = pygame.Surface((0,0)), enabled: bool = False) -> None:
         #setup debug

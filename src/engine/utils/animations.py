@@ -70,6 +70,18 @@ class EnemyAnimation(Animation):
             return self.sprites.down[img_id].get_image(1)
         else:
             return self.sprites.up[img_id].get_image(1)
+        
+class FieldAnimation(Animation):
+    def __init__(self, path: str) -> None:
+        Animation.__init__(self, path)
+        self.time_offset = random.randint(0, 1000)
+        
+    def get_curent_animation(self, img_id: int) -> pygame.Surface:     
+        """
+        renvoie une surface pygame contenant l'image du joueur
+        cette image est choisie en fonction des mouvements du joueur
+        """       
+        return self.sprites.field[img_id].get_image(1)
             
 class Sprite:
     """

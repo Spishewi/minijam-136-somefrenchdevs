@@ -133,3 +133,4 @@ class CameraView:
 
         const_hardcore = pygame.Vector2(draw_surface.get_width(), draw_surface.get_height()) / 2 - center_pos * tile_size_factor
         draw_surface.blit(surface, const_hardcore)
+        pygame.draw.rect(draw_surface, (255, 255, 255), (const_hardcore.x, const_hardcore.y, surface.get_width(), surface.get_height()), width=1)

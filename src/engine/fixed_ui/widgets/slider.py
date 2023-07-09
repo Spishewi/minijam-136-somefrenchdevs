@@ -5,6 +5,7 @@ import pygame
 from engine.fixed_ui.fixed_widget import Widget
 from engine.utils.hitbox import RectangularHitbox
 from engine.utils.enumerations import Orientation
+from engine.utils.sound import BUTTON_SOUND
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -70,6 +71,7 @@ class Slider(Widget):
         if event.type == pygame.MOUSEBUTTONDOWN and self.hovered:
             if event.button == pygame.BUTTON_LEFT:
                 self.grabbed = True
+                BUTTON_SOUND.play()
 
         if event.type == pygame.MOUSEBUTTONUP:
             if event.button == pygame.BUTTON_LEFT:

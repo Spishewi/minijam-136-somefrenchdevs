@@ -1,0 +1,7 @@
+{
+    "sprite_width":16,
+    "sprite_height":16,
+    "keyframes": {
+        "field":[[0, 0], [0, 2]]
+    }
+}
