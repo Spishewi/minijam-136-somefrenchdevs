@@ -2,32 +2,5 @@
     "authorized": true,
     "show_when_start": false,
     "font_size": 8,
-    "line_spacing": 8,
-    "colors": {
-        "collision_hitbox": [
-            255,
-            255,
-            0
-        ],
-        "interaction_hitbox": [
-            255,
-            0,
-            255
-        ],
-        "goal": [
-            255,
-            0,
-            0
-        ],
-        "rays": [
-            0,
-            0,
-            255
-        ],
-        "text": [
-            225,
-            225,
-            225
-        ]
-    }
+    "line_spacing": 8
 }

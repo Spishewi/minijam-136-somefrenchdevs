@@ -5,8 +5,8 @@
     },
     "activeFile": "map1.tmx",
     "expandedProjectPaths": [
-        "TilesetGrass",
-        "."
+        ".",
+        "TilesetGrass"
     ],
     "fileStates": {
         "TilesetGrass/grass_biome.tsx": {
@@ -34,7 +34,7 @@
             "selectedLayer": 1,
             "viewCenter": {
                 "x": 384,
-                "y": 383.875
+                "y": 383.75
             }
         },
         "grass_biome.tsx": {
@@ -44,8 +44,8 @@
             "scale": 3,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 411.33333333333337,
-                "y": 274
+                "x": 137.33333333333331,
+                "y": 142
             }
         },
         "map_titlescreen.tmx": {

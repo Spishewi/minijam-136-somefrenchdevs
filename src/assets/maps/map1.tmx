@@ -41,7 +41,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,120
 </data>
  </layer>
- <layer id="3" name="zone" width="16" height="16">
+ <layer id="3" name="zone" width="16" height="16" visible="0">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,252,252,252,0,0,0,0,0,
