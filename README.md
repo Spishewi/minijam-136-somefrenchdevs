@@ -1,6 +1,6 @@
 # Another Tower Defense - Some French Devs
 
-Another Tower Defense is a small 2D tower defense game made for **Mini Jam 136** in 72 hours by the team **Some French Devs**.
+Another Tower Defense is a small 2D tower defense game made for **Mini Jam 136** in 72 hours by our team, **Some French Devs**.
 You build towers and fields to survive waves of enemies on a pixel-art battlefield.
 
 ## Game jam
@@ -21,7 +21,7 @@ You build towers and fields to survive waves of enemies on a pixel-art battlefie
 
 ## How to play (itch.io build)
 
-1. Go to the [Itch.io page of the project](https://some-french-devs.itch.io/another-tower-defense)
+1. Go to the [itch.io page of the project](https://some-french-devs.itch.io/another-tower-defense)
 2. Click on the "download executable" button ( will download **Another Tower Defense.zip**)
 3. Extract it
 4. Run the executable
@@ -47,7 +47,7 @@ git clone https://github.com/Spishewi/minijam-136-somefrenchdevs.git
 cd minijam-136-somefrenchdevs
 ```
 
-4. Run the game :
+4. Run the game:
 
 ```bash
 python main.py
